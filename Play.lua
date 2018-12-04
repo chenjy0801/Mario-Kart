@@ -64,9 +64,12 @@ end
 local exit_guid = event.onexit(onexit)
 
 local current_action = 0
+local current_action2 = 0
 local frame = 1
 local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
+local steer = 0
+local item = 0
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -105,10 +108,16 @@ while util.readProgress() < 3 do
     end
   else
     if message ~= "PREDICTIONERROR" then
-      current_action = tonumber(message)
+      steer = util.split(";",message)[1]
+      item = util.split(";",message)[2]
+      current_action = tonumber(steer)
+      current_action2 = tonumber(item)
       for i=1, WAIT_FRAMES do
         joypad.set({["P1 A"] = true})
         joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+        if current_action2 == 1 then
+          joypad.set({["P1 Z"] = true})
+        end
         draw_info()
         emu.frameadvance()
       end
@@ -120,6 +129,9 @@ while util.readProgress() < 3 do
 
   joypad.set({["P1 A"] = true})
   joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+  if current_action2 == 1 then
+    joypad.set({["P1 Z"] = true})
+  end
   draw_info()
   emu.frameadvance()
 

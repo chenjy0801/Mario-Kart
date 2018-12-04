@@ -57,97 +57,6 @@ function util.readPlayerPos()
   return {util.readPlayerX(), util.readPlayerY(), util.readPlayerZ()}
 end
 
--- =============================================================== --
-
---util.CHARACTER = 0x0DC53B
---function util.readCharacter()
---  return mainmemory.read_u8(util.CHARACTER)
---end
-
-util.ITEM = 0x165F5B
-function util.readItem()
-	return memory.read_s8(util.ITEM)
-end
-
-
-util.LastItemAddr = 0x1658FD
-function util.lastitem()
-	return mainmemory.read_u8(util.LastItemAddr)
-end
-
-util.itemtable=0x802A7BD4
-function util.itemtable()
-	return mainmemory.readbyte(util.itemtable)
-end
-
-
-
-
-
-util.StateCAddr = 0x0F6A4C
-function util.C()
-	return mainmemory.read_u8(util.StateCAddr)
-end
-
-util.StateEAddr = 0x0F6A4E
-function util.E()
-	return mainmemory.read_u8(util.StateEAddr)
-end
-    
-
-util.StateFAddr = 0x0F6A4F
-function util.F()
-	return mainmemory.read_u8(util.StateFAddr)
-end
- 
-util.State5BAddr = 0x0F6A5B
-function util.B()
-    return mainmemory.read_u8(util.State5BAddr)
-end
-
-util.MTglideAddr = 0x0F6BCB
-function util.mt()
-	return mainmemory.read_u8(util.MTglideAddr)
-end
-
-
-
-
-
-util.AA = 0x0F699C
-function util.AAA()
-	return mainmemory.read_u8(util.AA)
-end
-
-util.AB = 0x0F699D
-function util.AAB()
-	return mainmemory.read_u8(util.AB)
-end
-
-util.AC = 0x0F699E
-function util.AC()
-	mainmemory.write_u8(0x0F699E, 32)
-end
-function util.DC()
-	mainmemory.write_u8(0x0F699E, 0)
-end
-
-function util.shrooming()
-  mainmemory.write_u8(0x0F6A4E, 32)
-end
-
-util.AD = 0x0F699F
-function util.AAD()
-	return mainmemory.read_u8(util.AD)
-end
-
-
-
--- =============================================================== --
-
-
-
-
 -- Read the current progress in the course from memory.
 util.PROGRESS_ADDRESS = 0x1644D0
 function util.readProgress()
@@ -203,6 +112,18 @@ function util.convertSteerToJoystick(steer, use_mapping)
   -- Map the -1 to 1 steer into an integer -128 to 127 space.
   local alpha = (steer + 1)/2
   return math.floor(util.lerp(util.JOYSTICK_MIN, util.JOYSTICK_MAX, alpha))
+end
+
+function util.split(delim,str)
+    local t = {}
+
+    for substr in string.gmatch(str, "[^".. delim.. "]*") do
+        if substr ~= nil and string.len(substr) > 0 then
+            table.insert(t,substr)
+        end
+    end
+
+    return t
 end
 
 return util

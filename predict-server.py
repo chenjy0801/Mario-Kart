@@ -1,5 +1,5 @@
 import sys, time, logging, os, argparse
-
+from sklearn.externals import joblib
 import numpy as np
 from PIL import Image, ImageGrab
 from socketserver import TCPServer, StreamRequestHandler
@@ -16,10 +16,17 @@ def prepare_image(im):
     im_arr = np.expand_dims(im_arr, axis=0)
     return im_arr
 
+def prepare_image2(im):
+    im = im.resize((INPUT_WIDTH, INPUT_HEIGHT))
+    im_arr = np.frombuffer(im.tobytes(), dtype=np.uint8)
+    im_arr = im_arr.reshape((INPUT_HEIGHT, INPUT_WIDTH, INPUT_CHANNELS))
+    item = im_arr[19:46,143:178,:]
+    return item.reshape([2835])
+
 class TCPHandler(StreamRequestHandler):
     def handle(self):
         if args.all:
-            weights_file = 'C:/Users/Junyi Chen/Desktop/NeuralKart-master/weights/all.hdf5'
+            weights_file = 'weights/all.hdf5'
             logger.info("Loading {}...".format(weights_file))
             model.load_weights(weights_file)
 
@@ -38,14 +45,20 @@ class TCPHandler(StreamRequestHandler):
                 im = ImageGrab.grabclipboard()
                 if im != None:
                     prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                    self.wfile.write((str(prediction[0]) + "\n").encode('utf-8'))
+                    prediction2 = model2.predict(prepare_image2(im))[0]
+                    self.wfile.write((str(prediction[0]) + ';' +
+                                      str(prediction2) +
+                                    "\n").encode('utf-8'))
                 else:
                     self.wfile.write("PREDICTIONERROR\n".encode('utf-8'))
 
             if message.startswith("PREDICT:"):
                 im = Image.open(message[8:])
                 prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                self.wfile.write((str(prediction[0]) + "\n").encode('utf-8'))
+                prediction2 = model2.predict(prepare_image2(im))[0]
+                self.wfile.write((str(prediction[0]) + ';' +
+                                  str(prediction2) +
+                                    "\n").encode('utf-8'))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Start a prediction server that other apps will call into.')
@@ -60,9 +73,11 @@ if __name__ == "__main__":
 
     logger.info("Loading model...")
     model = create_model(keep_prob=1)
+    model2 = joblib.load('use_item.m')
+
 
     if args.all:
-        model.load_weights('C:/Users/Junyi Chen/Desktop/NeuralKart-master/weights/all.hdf5')
+        model.load_weights('weights/all.hdf5')
 
     logger.info("Starting server...")
     server = TCPServer(('0.0.0.0', args.port), TCPHandler)
