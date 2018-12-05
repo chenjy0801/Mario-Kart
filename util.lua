@@ -116,14 +116,26 @@ end
 
 function util.split(delim,str)
     local t = {}
-
     for substr in string.gmatch(str, "[^".. delim.. "]*") do
         if substr ~= nil and string.len(substr) > 0 then
             table.insert(t,substr)
         end
     end
-
     return t
+end
+
+function util.popleft (list)
+    local first = list.first
+    if first > list.last then error("list is empty") end
+    local value = list[first]
+    list[first] = nil    -- to allow garbage collection
+    list.first = first + 1
+end
+
+function util.pushright (list, value)
+    local last = list.last + 1
+    list.last = last
+    list[last] = value
 end
 
 return util

@@ -70,6 +70,7 @@ local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
 local steer = 0
 local item = 0
+local mushroom = {1,1,1}
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -129,7 +130,12 @@ while util.readProgress() < 3 do
 
   joypad.set({["P1 A"] = true})
   joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
-  if current_action2 == 1 then
+  --if current_action2 == 1 then
+  --  joypad.set({["P1 Z"] = true})
+  --end
+  util.popleft(mushroom)
+  util.pushright(mushroom, util.convertSteerToJoystick(current_action))
+  if mushroom == {0,0,0} then
     joypad.set({["P1 Z"] = true})
   end
   draw_info()
