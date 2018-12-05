@@ -9,6 +9,109 @@ logger = logging.getLogger(__name__)
 
 from train import create_model, is_valid_track_code, INPUT_WIDTH, INPUT_HEIGHT, INPUT_CHANNELS
 
+# 提取边框
+H = np.array([[[1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.]]])
+V = np.array([[[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]],
+
+       [[1., 1., 1.]]])
+
+def get_edge(I):
+    up = I[17:18,143:178,:]
+    down = I[47:48,143:178,:]
+    left = I[19:46,141:142,:]
+    right = I[19:46,179:180,:]
+    return up,down,left,right
+
+def is_item(I):
+    up,down,left,right = get_edge(I)
+    if (up == H).all() and (down == H).all() and (left == V).all() and (right == V).all():
+        return True
+    return False
+
 def prepare_image(im):
     im = im.resize((INPUT_WIDTH, INPUT_HEIGHT))
     im_arr = np.frombuffer(im.tobytes(), dtype=np.uint8)
@@ -45,7 +148,10 @@ class TCPHandler(StreamRequestHandler):
                 im = ImageGrab.grabclipboard()
                 if im != None:
                     prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                    prediction2 = model2.predict([prepare_image2(im)])[0]
+                    if is_item(im):
+                        prediction2 = model2.predict([prepare_image2(im)])[0]
+                    else:
+                        prediction2 = 0
                     self.wfile.write((str(prediction[0]) + ';'
                                     + str(prediction2) +
                                     "\n").encode('utf-8'))
@@ -55,7 +161,10 @@ class TCPHandler(StreamRequestHandler):
             if message.startswith("PREDICT:"):
                 im = Image.open(message[8:])
                 prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                prediction2 = model2.predict([prepare_image2(im)])[0]
+                if is_item(im):
+                    prediction2 = model2.predict([prepare_image2(im)])[0]
+                else:
+                    prediction2 = 0
                 self.wfile.write((str(prediction[0]) + ';' + str(prediction2) +
                                     "\n").encode('utf-8'))
 
