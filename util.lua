@@ -124,18 +124,18 @@ function util.split(delim,str)
     return t
 end
 
-function util.popleft (list)
-    local first = list.first
-    if first > list.last then error("list is empty") end
-    local value = list[first]
-    list[first] = nil    -- to allow garbage collection
-    list.first = first + 1
-end
-
-function util.pushright (list, value)
-    local last = list.last + 1
-    list.last = last
-    list[last] = value
+function util.is_equal(t)
+  if t[1] == t[2] then
+    if t[2] == t[3] then
+      if t[1] > -0.01 and t[1] < 0.01 then
+        return true
+      end
+    end
+  end
+  return false
 end
 
 return util
+
+
+

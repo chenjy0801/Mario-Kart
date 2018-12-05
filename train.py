@@ -96,7 +96,7 @@ def load_training_data(track):
 
         steering = [float(line) for line in open(
             ("{}/steering.txt").format(recording)).read().splitlines()]
-
+        
         assert len(filenames) == len(steering), "For recording %s, the number of steering values does not match the number of images." % recording
 
         for file, steer in zip(filenames, steering):

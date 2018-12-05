@@ -45,9 +45,9 @@ class TCPHandler(StreamRequestHandler):
                 im = ImageGrab.grabclipboard()
                 if im != None:
                     prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                    prediction2 = model2.predict(prepare_image2(im))[0]
-                    self.wfile.write((str(prediction[0]) + ';' +
-                                      str(prediction2) +
+                    prediction2 = model2.predict([prepare_image2(im)])[0]
+                    self.wfile.write((str(prediction[0]) + ';'
+                                    + str(prediction2) +
                                     "\n").encode('utf-8'))
                 else:
                     self.wfile.write("PREDICTIONERROR\n".encode('utf-8'))
@@ -55,9 +55,8 @@ class TCPHandler(StreamRequestHandler):
             if message.startswith("PREDICT:"):
                 im = Image.open(message[8:])
                 prediction = model.predict(prepare_image(im), batch_size=1)[0]
-                prediction2 = model2.predict(prepare_image2(im))[0]
-                self.wfile.write((str(prediction[0]) + ';' +
-                                  str(prediction2) +
+                prediction2 = model2.predict([prepare_image2(im)])[0]
+                self.wfile.write((str(prediction[0]) + ';' + str(prediction2) +
                                     "\n").encode('utf-8'))
 
 if __name__ == "__main__":
@@ -85,3 +84,4 @@ if __name__ == "__main__":
     print("Listening on Port: {}".format(server.server_address[1]))
     sys.stdout.flush()
     server.serve_forever()
+
