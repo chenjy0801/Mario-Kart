@@ -35,7 +35,7 @@ event.onexit(function()
 end)
 
 local play = loadfile("Play.lua")
-local search = loadfile("SearchAI.lua")
+local search = loadfile("SearchAI-drift.lua")
 
 local iteration = 1
 while true do

@@ -181,6 +181,37 @@ util.COURSE_NAMES = {"Mario Raceway", "Choco Mountain", "Bowser's Castle", "Bans
   "Yoshi Valley", "Frappe Snowland", "Koopa Troopa Beach", "Royal Raceway", "Luigi Raceway",
   "Moo Moo Farm", "Toad's Turnpike", "Kalimari Desert", "Sherbert Land", "Rainbow Road",
   "Wario Raceway", "Block Fort", "Skyscraper", "Double Deck", "D.K.'s Jungle Parkway", "Big Donut", "TC"}
+
+
+--===============================================--
+--util.actions={["0"]=0,["-0.4"]=1,["-0.2"]=2,["0.2"]=3,["0.4"]=4,["-"]=5,["0.2"]=6,["0.4"]=7,["0.6"]=8,["0.8"]=9,["1"]=10}
+--util.reactions={0,-0.4,-0.2,0.2,0.4,-1,-0.8,-0.6,-0.4,-0.2,0.2,0.4,0.6,0.8,1}
+util.actions = {["-1"]=5, ["-0.8"]=6, ["-0.6"]=7, ["-0.4"]=8, ["-0.2"]=9, ["0.2"]=10, ["0.4"]=11, ["0.6"]=12, ["0.8"]=13, ["1"]=14}
+util.actions1 = {["0"]=0, ["-0.4"]=1, ["-0.2"]=2,["0.2"]=3,["0.4"]=4}
+
+util.reactions = {-1,-0.8,-0.6,-0.4,-0.2,0.2,0.4,0.6,0.8,1}
+util.reactions1 = {-0.4,-0.2,0.2,0.4}
+--    drift  steer
+-- 0 :  0      0 
+-- 1 :  0     -0.4 
+-- 2 :  0     -0.2 
+-- 3 :  0      0.2
+-- 4 :  0      0.4 
+-- 5:   1      -1 
+-- 6:   1      -0.8
+-- 7:   1      -0.6
+-- 8:   1      -0.4 
+-- 9:   1      -0.2
+-- 10:  1       0.2
+-- 11:  1       0.4
+-- 12:  1       0.6
+-- 13:  1       0.8
+-- 14:  1       1
+
+--===============================================--
+
+
+
 util.COURSE_ADDRESS = 0x0DC5A1
 function util.readCourse()
   local i = mainmemory.read_u8(util.COURSE_ADDRESS)
@@ -203,6 +234,24 @@ function util.convertSteerToJoystick(steer, use_mapping)
   -- Map the -1 to 1 steer into an integer -128 to 127 space.
   local alpha = (steer + 1)/2
   return math.floor(util.lerp(util.JOYSTICK_MIN, util.JOYSTICK_MAX, alpha))
+end
+
+function util.split(delim,str)
+
+    local t = {}
+
+    for substr in string.gmatch(str, "[^".. delim.. "]*") do
+
+        if substr ~= nil and string.len(substr) > 0 then
+
+            table.insert(t,substr)
+
+        end
+
+    end
+
+    return t
+
 end
 
 return util

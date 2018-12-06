@@ -64,9 +64,14 @@ end
 local exit_guid = event.onexit(onexit)
 
 local current_action = 0
+local current_action1 = 0
+local current_action2 = 0
 local frame = 1
 local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
+local steer = 0
+local item = 0
+local drift = 0
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -75,8 +80,8 @@ function draw_info()
   gui.drawBox(BOX_CENTER_X - BOX_WIDTH / 2, BOX_CENTER_Y - BOX_HEIGHT / 2,
               BOX_CENTER_X + BOX_WIDTH / 2, BOX_CENTER_Y + BOX_HEIGHT / 2,
               none, 0x60FFFFFF)
-  gui.drawBox(BOX_CENTER_X + current_action*(BOX_WIDTH / 2) - SLIDER_WIDTH / 2, BOX_CENTER_Y - SLIDER_HIEGHT / 2,
-              BOX_CENTER_X + current_action*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
+  gui.drawBox(BOX_CENTER_X + steer*(BOX_WIDTH / 2) - SLIDER_WIDTH / 2, BOX_CENTER_Y - SLIDER_HIEGHT / 2,
+              BOX_CENTER_X + steer*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
               none, 0xFFFF0000)
 end
 
@@ -106,9 +111,27 @@ while util.readProgress() < 3 do
   else
     if message ~= "PREDICTIONERROR" then
       current_action = tonumber(message)
+      print(current_action)
+
+      if current_action == 0 then
+          drift = 0
+          steer = 0
+      elseif current_action <= 4 then
+      		drift=0
+      		steer=util.reactions1[current_action]
+      else
+      		drift=1
+      		steer=util.reactions[current_action-4]
+      end
       for i=1, WAIT_FRAMES do
         joypad.set({["P1 A"] = true})
-        joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+        if drift ==1 then 
+          joypad.set({["P1 R"] = true }) 
+        end
+        joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer) })
+        --if current_action2 == 1 then
+        --  joypad.set({["P1 Z"] = true})
+        --end
         draw_info()
         emu.frameadvance()
       end
@@ -118,8 +141,24 @@ while util.readProgress() < 3 do
     request_prediction()
   end
 
+  if current_action == 0 then
+      drift = 0
+      steer = 0
+  elseif current_action <= 4 then
+      drift=0
+      steer=util.reactions1[current_action]
+  else
+      drift=1
+      steer=util.reactions[current_action-4]
+  end
   joypad.set({["P1 A"] = true})
-  joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+  if drift ==1 then 
+    joypad.set({["P1 R"] = true }) 
+  end
+  joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer) })
+  --if current_action2 == 1 then
+  --  joypad.set({["P1 Z"] = true})
+  --end
   draw_info()
   emu.frameadvance()
 

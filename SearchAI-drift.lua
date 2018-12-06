@@ -77,7 +77,6 @@ function eval_actions(actions, actions_history, drifts, drifts_history)
   savestate.load(STATE_FILE)
 
   local start_progress = util.readProgress()
-  print("start")
   for _, drift in ipairs(drifts) do
     print("drift:", drift)
     for _, action in ipairs(actions) do
@@ -156,18 +155,37 @@ function best_next_action(actions_so_far, actions_history, drift_so_far, drift_h
   table.remove(drift_so_far)
 
   for drift = 0, 1 do
-    for action in util.linspace(-1, 1, STEERING_BINS) do
-      if math.abs(action) > 1e-5 then
-        table.insert(actions_so_far, action)
-        table.insert(drift_so_far, drift)
-        local _, score, _ = best_next_action(actions_so_far, actions_history, drift_so_far, drift_history)
-        if score > best_score then
-          best_score = score
-          best_action = action
-          best_drift = drift
+    if drift == 0 then
+      --for action in util.linspace(-1, 1, STEERING_BINS) do
+      for action = 0.4, -0.4, -0.2 do
+        if math.abs(action) > 1e-5 then
+          table.insert(actions_so_far, action)
+          table.insert(drift_so_far, drift)
+          local _, score, _ = best_next_action(actions_so_far, actions_history, drift_so_far, drift_history)
+          if score > best_score then
+            best_score = score
+            best_action = action
+            best_drift = drift
+          end
+          table.remove(actions_so_far)
+          table.remove(drift_so_far)
         end
-         table.remove(actions_so_far)
-         table.remove(drift_so_far)
+      end
+    end
+    if drift == 1 then
+      for action in util.linspace(-1, 1, STEERING_BINS) do
+        if math.abs(action) > 1e-5 then
+          table.insert(actions_so_far, action)
+          table.insert(drift_so_far, drift)
+          local _, score, _ = best_next_action(actions_so_far, actions_history, drift_so_far, drift_history)
+          if score > best_score then
+            best_score = score
+            best_action = action
+            best_drift = drift
+          end
+           table.remove(actions_so_far)
+           table.remove(drift_so_far)
+        end
       end
     end
   end
@@ -182,6 +200,7 @@ if RECORDING_START_FRAME ~= nil then recording_frame = RECORDING_START_FRAME end
 local steering_file = io.open(RECORDING_FOLDER .. '\\steering.txt', 'a')
 local actions_history = {}
 local drift_history = {}
+local record = 0
 while util.readProgress() < 3 do
   client.pause_av()
   start_time = os.time()
@@ -190,7 +209,18 @@ while util.readProgress() < 3 do
 
   end_time = os.time()
 
-  print("Action:", action, "Drift:", drift, "Score:", score, "Time:", end_time - start_time)
+  if drift == 0 then
+    if action == 0 then
+      record = 0
+    else
+      record = util.actions1[tostring(action)]
+    end
+  else 
+    record = util.actions[tostring(action)]
+  end 
+
+  --record = util.actions[tostring(action)] + drift*10
+  print("Action:", action, "Drift:", drift, "Score:", score, "Time:", end_time - start_time, "Record:",record)
   table.insert(actions_history, action)
   table.insert(drift_history, drift)
   
@@ -198,7 +228,7 @@ while util.readProgress() < 3 do
   savestate.load(STATE_FILE)
 
   client.screenshot(RECORDING_FOLDER .. '\\' .. recording_frame .. '.png')
-  steering_file:write(action .." ".. drift .." ".. tostring(score)..'\n')
+  steering_file:write(record..'\n')
   steering_file:flush()
   recording_frame = recording_frame + 1
 
