@@ -5,11 +5,12 @@ This script plays selected tracks forever in a loop, for purposes of demoing the
 
 --[[ BEGIN CONFIGURATION ]]--
 RACE_END_FRAMES = 700 -- The number of frames to show the time cards at the end of a race.
-TRACKS = {'states/TT/LR.state', 'states/GP/MMF.state', 'states/TT/CM.state'}
+TRACKS = {'states/TT/LR.state', 'states/GP/MMF.state'}
 --[[ END CONFIGURATION ]]--
 
 local util = require("util")
 local play = loadfile("Play.lua")
+local train = loadfile("SearchAI-drift.lua")
 
 client.unpause()
 event.onexit(function()
@@ -22,7 +23,7 @@ while true do
     savestate.load(TRACKS[state])
     print("Mode:", util.readMode(), "Course:", util.readCourse())
 
-    play()
+    train()
 
     -- If the race was successful, play a little but forward so that we can see the times.
     if util.readProgress() >= 3 then

@@ -72,7 +72,7 @@ def create_model(keep_prob=0.6):
 	model.add(Dropout(drop_out))
 	model.add(Dense(50, activation='relu'))
 	model.add(Dropout(drop_out))
-	model.add(Dense(10, activation='relu'))
+	model.add(Dense(20, activation='relu'))
 	model.add(Dropout(drop_out))
 	model.add(Dense(15, activation='softmax', name="predictions"))
 

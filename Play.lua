@@ -72,6 +72,7 @@ local esc_prev = input.get()['Escape']
 local steer = 0
 local item = 0
 local drift = 0
+local drift_timing = 0
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -127,11 +128,16 @@ while util.readProgress() < 3 do
         joypad.set({["P1 A"] = true})
         if drift ==1 then 
           joypad.set({["P1 R"] = true }) 
+        --  drift_timing = 3
+        --end
+        --if drift_timing ~=0 then
+        --  joypad.set({["P1 R"] = true })
+        --  drift_timing=drift_timing-1
         end
         joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer) })
         --if current_action2 == 1 then
         --  joypad.set({["P1 Z"] = true})
-        --end
+        --		end
         draw_info()
         emu.frameadvance()
       end
@@ -153,7 +159,12 @@ while util.readProgress() < 3 do
   end
   joypad.set({["P1 A"] = true})
   if drift ==1 then 
-    joypad.set({["P1 R"] = true }) 
+    --joypad.set({["P1 R"] = true }) 
+    --drift_timing = 3
+   --end
+   --if drift_timing ~=0 then
+      joypad.set({["P1 R"] = true })
+    --  drift_timing=drift_timing-1
   end
   joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer) })
   --if current_action2 == 1 then

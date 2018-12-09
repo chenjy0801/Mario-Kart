@@ -19,7 +19,8 @@ for steer in ppp:
 	final_df.append(df)
 
 final_df=pd.concat(final_df)
-
+print(final_df[0])
+print(final_df[0].value_counts())
 final_df.hist(bins=40)
 
 plt.savefig('C:/Users/Junyi Chen/Desktop/NeuralKart-master - Copy/figure.png')

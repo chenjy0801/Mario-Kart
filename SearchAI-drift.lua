@@ -227,9 +227,11 @@ while util.readProgress() < 3 do
 
   savestate.load(STATE_FILE)
 
-  client.screenshot(RECORDING_FOLDER .. '\\' .. recording_frame .. '.png')
-  steering_file:write(record..'\n')
-  steering_file:flush()
+  --if record ~= 0 and (record <=7 or record > 10) then 
+    client.screenshot(RECORDING_FOLDER .. '\\' .. recording_frame .. '.png')
+    steering_file:write(record..'\n')
+    steering_file:flush()
+  --end
   recording_frame = recording_frame + 1
 
   local start_progress = util.readProgress()
