@@ -125,14 +125,11 @@ function util.split(delim,str)
 end
 
 function util.is_equal(t)
-  if t[1] == t[2] then
-    if t[2] == t[3] then
-      if t[1] > -0.01 and t[1] < 0.01 then
-        return true
-      end
-    end
+  if t[1] > -0.01 and t[1] < 0.01 and t[2] > -0.01 and t[2] < 0.01 and  t[3] > -0.01 and t[3] < 0.01 and t[4] > -0.01 and t[4] < 0.01 and t[5] > -0.01 and t[5] < 0.01 then
+    return true
+  else
+    return false
   end
-  return false
 end
 
 return util

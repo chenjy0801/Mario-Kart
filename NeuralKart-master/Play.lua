@@ -65,13 +65,16 @@ local exit_guid = event.onexit(onexit)
 
 local current_action = 0
 local current_action2 = 0
+local current_action3 = 0
 local frame = 1
 local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
 local steer = 0
 local item = 0
-local mushroom = {1,1,1}
-local step = 500
+local mushroom = {1,1,1,1,1}
+local drift = 0
+local kart = 0
+local shell = 0
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -112,14 +115,15 @@ while util.readProgress() < 3 do
     if message ~= "PREDICTIONERROR" then
       steer = util.split(";",message)[1]
       item = util.split(";",message)[2]
+      kart = util.split(";",message)[3]
       current_action = tonumber(steer)
       current_action2 = tonumber(item)
+      current_action3 = tonumber(kart)
       for i=1, WAIT_FRAMES do
         joypad.set({["P1 A"] = true})
         joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
         if current_action2 == 1 then
           joypad.set({["P1 Z"] = true})
-          joypad.set({["P1 Z"] = false})
         end
         draw_info()
         emu.frameadvance()
@@ -132,22 +136,43 @@ while util.readProgress() < 3 do
 
   joypad.set({["P1 A"] = true})
   joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
-  --if current_action2 == 1 then
-	--joypad.set({["P1 Z"] = true})
-  --end
+  
   mushroom[1] = mushroom[2]
   mushroom[2] = mushroom[3]
-  mushroom[3] = current_action
-  if  util.is_equal(mushroom) then
-  	if step == 0 then
-  	  joypad.set({["P1 Z"] = true})
-      step = 500
-    end
+  mushroom[3] = mushroom[4]
+  mushroom[4] = mushroom[5]
+  mushroom[5] = current_action
+
+
+-- drift part
+  -- if current_action > 0.5 or current_action < -0.5 then
+  -- 	drift = 5
+  -- end
+  -- if drift > 0 then
+  -- 	joypad.set({["P1 R"] = true})
+  -- 	drift = drift - 1
+  -- end
+
+-- normal item
+  if current_action2 == 1 then
+	joypad.set({["P1 Z"] = true})
   end
 
-  if step > 0 then
-  	step = step - 1
+-- mushroom  	
+  if current_action2 == 2 and util.is_equal(mushroom) then
+	joypad.set({["P1 Z"] = true})
   end
+
+  if current_action3 > 1 then
+  	joypad.set({["P1 Z"] = true})
+  	shell = 10
+  end
+
+  if tonumber(shell) > 0 then
+  	joypad.set({["P1 Z"] = true})
+  	shell = shell - 1
+  end
+
 
   draw_info()
   emu.frameadvance()
