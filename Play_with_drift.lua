@@ -64,17 +64,15 @@ end
 local exit_guid = event.onexit(onexit)
 
 local current_action = 0
+local current_action1 = 0
 local current_action2 = 0
-local current_action3 = 0
 local frame = 1
 local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
 local steer = 0
 local item = 0
-local mushroom = {1,1,1,1,1}
 local drift = 0
-local kart = 0
-local shell = 0
+local time = 0
 
 BOX_CENTER_X, BOX_CENTER_Y = 160, 215
 BOX_WIDTH, BOX_HEIGHT = 100, 4
@@ -83,8 +81,8 @@ function draw_info()
   gui.drawBox(BOX_CENTER_X - BOX_WIDTH / 2, BOX_CENTER_Y - BOX_HEIGHT / 2,
               BOX_CENTER_X + BOX_WIDTH / 2, BOX_CENTER_Y + BOX_HEIGHT / 2,
               none, 0x60FFFFFF)
-  gui.drawBox(BOX_CENTER_X + current_action*(BOX_WIDTH / 2) - SLIDER_WIDTH / 2, BOX_CENTER_Y - SLIDER_HIEGHT / 2,
-              BOX_CENTER_X + current_action*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
+  gui.drawBox(BOX_CENTER_X + steer*(BOX_WIDTH / 2) - SLIDER_WIDTH / 2, BOX_CENTER_Y - SLIDER_HIEGHT / 2,
+              BOX_CENTER_X + steer*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
               none, 0xFFFF0000)
 end
 
@@ -113,18 +111,33 @@ while util.readProgress() < 3 do
     end
   else
     if message ~= "PREDICTIONERROR" then
-      steer = util.split(";",message)[1]
-      item = util.split(";",message)[2]
-      kart = util.split(";",message)[3]
-      current_action = tonumber(steer)
-      current_action2 = tonumber(item)
-      current_action3 = tonumber(kart)
+      current_action = tonumber(message)
+      print(current_action)
+
+      if current_action == 0 then
+          drift = 0
+          steer = 0
+      elseif current_action <= 4 then
+      		drift=0
+      		steer=util.reactions1[current_action]
+      else
+      		drift=1
+      		steer=util.reactions[current_action-4]
+      end
       for i=1, WAIT_FRAMES do
         joypad.set({["P1 A"] = true})
-        joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
-        if current_action2 == 1 then
-          joypad.set({["P1 Z"] = true})
-        end
+
+		  if drift == 1 then 
+		     joypad.set({["P1 R"] = true })
+		  	if time == 0 then
+		       time = 2
+	     end
+		  end
+		  if time ~=0 then
+		     joypad.set({["P1 R"] = true })
+		     time=time-1
+		  end 
+			joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer)}) 		
         draw_info()
         emu.frameadvance()
       end
@@ -134,46 +147,32 @@ while util.readProgress() < 3 do
     request_prediction()
   end
 
+  if current_action == 0 then
+      drift = 0
+      steer = 0
+  elseif current_action <= 4 then
+      drift=0
+      steer=util.reactions1[current_action]
+  else
+      drift=1
+      steer=util.reactions[current_action-4]
+  end
   joypad.set({["P1 A"] = true})
-  joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+
+  if drift == 1 then 
+     joypad.set({["P1 R"] = true })
+	   if time == 0 then
+       time = 2
+     end
+  end
+  if time ~=0 then
+     joypad.set({["P1 R"] = true })
+     print("current_action:", current_action,"drift:",drift,"steer:",steer)
+     time=time-1
+   end
+  	joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(steer)})
+
   
-  mushroom[1] = mushroom[2]
-  mushroom[2] = mushroom[3]
-  mushroom[3] = mushroom[4]
-  mushroom[4] = mushroom[5]
-  mushroom[5] = current_action
-
-
--- drift part
-  -- if current_action > 0.5 or current_action < -0.5 then
-  -- 	drift = 5
-  -- end
-  -- if drift > 0 then
-  -- 	joypad.set({["P1 R"] = true})
-  -- 	drift = drift - 1
-  -- end
-
--- normal item
-  if current_action2 == 1 then
-	joypad.set({["P1 Z"] = true})
-  end
-
--- mushroom  	
-  if current_action2 == 2 and util.is_equal(mushroom) then
-	joypad.set({["P1 Z"] = true})
-  end
-
-  if current_action3 > 1 then
-  	joypad.set({["P1 Z"] = true})
-  	shell = 10
-  end
-
-  if tonumber(shell) > 0 then
-  	joypad.set({["P1 Z"] = true})
-  	shell = shell - 1
-  end
-
-
   draw_info()
   emu.frameadvance()
 
@@ -197,4 +196,3 @@ end
 
 onexit()
 event.unregisterbyid(exit_guid)
-

@@ -5,7 +5,7 @@ This script plays selected tracks forever in a loop, for purposes of demoing the
 
 --[[ BEGIN CONFIGURATION ]]--
 RACE_END_FRAMES = 700 -- The number of frames to show the time cards at the end of a race.
-TRACKS = {'states/TT/LR.state', 'states/GP/MMF.state'}
+TRACKS = {'states/GP/LR.state', 'states/GP/MMF.state'}
 --[[ END CONFIGURATION ]]--
 
 local util = require("util")
@@ -18,6 +18,8 @@ event.onexit(function()
 end)
 
 local state = 1
+
+
 while true do
     -- Start from the beginning and play.
     savestate.load(TRACKS[state])

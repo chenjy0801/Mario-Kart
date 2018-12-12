@@ -141,7 +141,9 @@ function util.AAD()
 	return mainmemory.read_u8(util.AD)
 end
 
-
+function util.slide()
+  mainmemory.write_u8(0x0F6A4C,32)
+end
 
 -- =============================================================== --
 

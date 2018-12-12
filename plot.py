@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
 
-path = "C:/Users/Junyi Chen/Desktop/NeuralKart-master - Copy/recordings/LR/TT/"
+path = "recordings/LR/TT/"
 files=os.listdir(path)
 
 ppp=[]
