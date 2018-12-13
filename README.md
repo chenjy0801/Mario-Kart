@@ -8,3 +8,5 @@ We developed a real-time Mario Kart 64 autopilot which trains and plays without 
 Simulator: Bizhawk<br>
 Rom: Mario Kart 64 (US version)<br>
 Enviorment: Windows<br>
+
+Demo Link: https://www.youtube.com/watch?v=YtORFeG191s&t=7s
